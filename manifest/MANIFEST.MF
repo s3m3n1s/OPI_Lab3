@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.10.9
+Created-By: 15.0.2+7 (Oracle Corporation)
+
+MD5 HelloWorld: 3661b3c4b851fa89e68c87b3528c6984
+SHA-1 HelloWorld: 577c53dc828468687d4af91793d2e4fccc6584e3
+MD5 TestTest: 8624ab42010194583de61211f3e953d6
+SHA-1 TestTest: 431b866164a7fac985dc4f4d8a4fb849f4cbcde9

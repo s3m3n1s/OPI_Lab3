@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<project name="HelloWorld" default="compile">
+    <property name="propertyFile" value="properties" />
+    <loadproperties srcFile="${propertyFile}"/>
+    <fileset id="altbin" dir="${altsrc}${altpackage}/">
+        <include name="*.java"/>
+    </fileset>
+
+
+
+  <target name="compile">
+    <mkdir dir="build/classes"/>
+    <javac destdir="build/classes" includeantruntime="false">
+      <src path="src"/>
+    </javac>
+  </target>
+
+  <target name="build" depends="compile">
+    <jar destfile="build/HelloWorld.jar" basedir="build/classes">
+      <manifest>
+        <attribute name="Main-class" value="HelloWorld"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="clean">
+    <delete dir="build"/>
+  </target>
+
+  <target name="run" depends="compile">
+    <java classname="HelloWorld" classpath="build/classes"/>
+  </target>
+
+  <target name="test" depends="compile">
+    <junit>
+      <classpath>
+        <pathelement location="build/classes"/>
+      </classpath>
+      <test name="TestTest"/>
+    </junit>
+  </target>
+
+  <target name="xml" description="xml">
+    <xmlvalidate failonerror="no">
+      <fileset dir="." includes="*/.xml"/>
+    </xmlvalidate>
+  </target>
+
+  <target name="doc">
+      <javadoc packagenames="src" sourcepath="src" destdir="javadoc">
+      <!-- Define which files / directory should get included, we include all -->
+       <fileset dir="src">
+                <include name="**" />
+           </fileset>
+    </javadoc>
+    <mkdir dir="manifest"/>
+    <zip destfile="manifest/javadoc.zip" basedir="javadoc" />
+    <delete dir="javadoc" />
+    <checksum file="src/HelloWorld.java" algorithm="MD5" todir="manifest"/>
+    <checksum file="src/TestTest.java" algorithm="MD5" todir="manifest"/>
+    <checksum file="src/HelloWorld.java" algorithm="SHA-1" todir="manifest"/>
+    <checksum file="src/TestTest.java" algorithm="SHA-1" todir="manifest"/>
+    <manifest file="manifest/manifest_example.mf"/>
+    <concat destfile="manifest/MANIFEST.MF">
+        <fileset file="manifest/manifest_example.mf" />
+        <string value="MD5 HelloWorld: "/>
+        <fileset file="manifest/HelloWorld.java.MD5" />
+        <string value="SHA-1 HelloWorld: "/>
+        <fileset file="manifest/HelloWorld.java.SHA-1" />
+        <string value="MD5 TestTest: "/>
+        <fileset file="manifest/TestTest.java.MD5" />
+        <string value="SHA-1 TestTest: "/>
+        <fileset file="manifest/TestTest.java.SHA-1" />
+    </concat>
+    <delete file="manifest/manifest_example.mf"/>
+  </target>
+
+
+
+  <target name="env" description="Build and Run for specific JVM">
+    <antcall target="compile">
+        <param name="version" value="${compiler}"/>
+        <param name="args" value="${compiler.args}"/>
+    </antcall>
+    <antcall target="build"/>
+    <java jar="build/HelloWorld.jar" fork="true"/>
+    </target>
+
+
+    <target name="alt" description="alternative compilation">
+
+        <mkdir dir="${altsrc}" />
+        <mkdir dir="${altsrc}${altpackage}" />
+        <copy todir="${altsrc}${altpackage}">
+            <fileset dir="src">
+                <include name="*.java" />
+            </fileset>
+        </copy>
+        <replaceregexp match="package ${package}" replace="package ${altpackage}">
+            <fileset refid="altbin" />
+        </replaceregexp>
+        <replace dir="${altsrc}${altpackage}" includes="**/*.java" propertyFile="properties">
+            <replacefilter token="${classToReplace}" property="classReplaced" />
+            <replacefilter token="${varToReplace}" property="varReplaced" />
+        </replace>
+        <move file="${altsrc}${altpackage}/${classToReplace}.java" tofile="${altsrc}${altpackage}/${classReplaced}.java" />
+        <antcall target="build" inheritRefs="true">
+            <param name="src" value="${altsrc}" />
+            <param name="package" value="${altpackage}" />
+            <param name="target" value="alt${target}" />
+            <param name="mainClass" value="${classReplaced}" />
+        </antcall>
+    </target>
+
+
+</project>

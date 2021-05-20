@@ -1,0 +1,8 @@
+package=Hello
+altsrc=altsrc
+altpackage=labalt
+classToReplace=HelloWorld
+classReplaced=HelloWorldAlt
+varToReplace=aaaaa
+varReplaced=aaaaaalt
+compiler.args=Xmx16G
